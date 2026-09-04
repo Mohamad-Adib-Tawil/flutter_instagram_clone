@@ -1,31 +1,84 @@
-## Instagram Clone with Flutter and Firebase
+# Instagram Clone
 
-This project is an Instagram clone built using Flutter and Firebase services. It aims to replicate some of the core functionalities and UI elements of the Instagram app while integrating Firebase for backend services.
+تطبيق تواصل اجتماعي مبني باستخدام Flutter، مستوحى من تجربة Instagram، ويهدف إلى توفير أساس عملي قابل للتطوير لبناء تطبيق اجتماعي متكامل.
 
-## Tutorial : https://www.youtube.com/playlist?list=PLNtn1FgzEKBBSHG6noFTyTTSas5oNn5t0
+## نبذة عن المشروع
 
-## Features
+يحتوي التطبيق على واجهات وتجارب أساسية لتطبيقات التواصل الاجتماعي، مع استخدام Firebase لإدارة الحسابات والبيانات والملفات. تم تجهيز المشروع ليكون نقطة بداية مناسبة لإضافة مزايا جديدة وتحسين تجربة المستخدم مستقبلًا.
 
-Authentication: User sign-up and login functionalities using Firebase Authentication.
+## المزايا الحالية
 
-Real-time Database: Store and retrieve user data, posts, Reels and related information using Firebase Firestore.
+- إنشاء حساب وتسجيل الدخول باستخدام Firebase Authentication.
+- عرض المنشورات في الصفحة الرئيسية.
+- إنشاء المنشورات وإضافة النصوص والصور.
+- إنشاء وعرض مقاطع Reels.
+- الإعجاب بالمنشورات ومقاطع Reels.
+- إضافة التعليقات وعرضها.
+- متابعة المستخدمين وإلغاء متابعتهم.
+- عرض الملفات الشخصية وعدد المتابعين والمتابَعين.
+- استكشاف المستخدمين والمحتوى.
+- رفع الصور ومقاطع الفيديو باستخدام Firebase Storage.
+- تخزين البيانات ومزامنتها باستخدام Cloud Firestore.
 
-Storage: Upload and retrieve images for user profiles and posts using Firebase Storage.
+## التقنيات المستخدمة
 
-Feed: Displaying a feed with posts from followed users.
+- Flutter و Dart
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Storage
+- Firebase Core
+- Image Picker
+- Photo Manager
+- Video Player
 
-Post Creation: Ability to create and upload new posts with captions and images.
+## متطلبات التشغيل
 
-Reels Creation: Ability to create and upload new reels with captions and video.
+- Flutter SDK بإصدار يدعم Dart 3.1 أو أحدث.
+- Android Studio أو Xcode حسب المنصة المستهدفة.
+- مشروع Firebase مهيأ لتطبيق Android و iOS.
 
-Profile: User profiles with followers, following counts, and editable profile details.
+## التشغيل محليًا
 
-Explore: Discover new users and content.
+```bash
+git clone https://github.com/Mohamad-Adib-Tawil/flutter_instagram_clone.git
+cd flutter_instagram_clone
+flutter pub get
+flutter run
+```
 
-## Credits
+## إعداد Firebase
 
-This project is maintained by Mohamad Adib Tawil. Feel free to reach out with any questions or suggestions.
+أنشئ مشروع Firebase خاصًا بك، وأضف تطبيقي Android و iOS، ثم حدّث ملفات الإعداد وفعّل Authentication و Cloud Firestore و Storage. طبّق قواعد أمان مناسبة قبل استخدام التطبيق في الإنتاج.
 
-![1](images/instagram.jpg)
-![2](images/post.jpg)
-![3](images/logo.jpg)
+## هيكل المشروع
+
+```text
+lib/
+├── auth/                 # شاشات المصادقة والتنقل الرئيسي
+├── data/                 # الخدمات والنماذج والتعامل مع Firebase
+├── screen/               # شاشات التطبيق
+├── util/                 # الأدوات والمكونات المساعدة
+└── main.dart             # نقطة تشغيل التطبيق
+```
+
+## خارطة التطوير
+
+- تحسين إدارة الحالة وفصل منطق الأعمال عن الواجهات.
+- إضافة الإشعارات والرسائل الخاصة.
+- تحسين البحث والأداء وتجربة الاستخدام.
+- إضافة اختبارات unit و widget و integration.
+- تجهيز التطبيق للنشر على Android و iOS.
+
+## المساهمة
+
+الاقتراحات والتحسينات مرحب بها. يرجى فتح Issue لاقتراح ميزة أو الإبلاغ عن مشكلة، أو إنشاء Pull Request للتغييرات البرمجية.
+
+## الترخيص
+
+هذا المشروع مخصص للتطوير والتعلم. راجع إعدادات المستودع قبل استخدامه أو توزيعه تجاريًا.
+
+## المطور
+
+Mohamad Adib Tawil
+
+[GitHub](https://github.com/Mohamad-Adib-Tawil)
