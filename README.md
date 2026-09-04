@@ -24,8 +24,8 @@ Explore: Discover new users and content.
 
 ## Credits
 
-This project was created by Alireza Mohammadian. Feel free to reach out with any questions or suggestions
+This project is maintained by Mohamad Adib Tawil. Feel free to reach out with any questions or suggestions.
 
-![1](https://github.com/alireza4585/flutter_instagram_clone/assets/102475069/0e9befdb-c358-4d57-b167-693c740c0eff)
-![2](https://github.com/alireza4585/flutter_instagram_clone/assets/102475069/ac503ae7-8e37-4360-808e-10d19b1dbc9d)
-![3](https://github.com/alireza4585/flutter_instagram_clone/assets/102475069/7594d7ea-07a1-4a8d-ab3b-032c1858a449)
+![1](images/instagram.jpg)
+![2](images/post.jpg)
+![3](images/logo.jpg)
