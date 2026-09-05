@@ -10,8 +10,9 @@ import 'package:flutter_instagram_clone/widgets/post_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileScreen extends StatefulWidget {
-  String Uid;
-  ProfileScreen({super.key, required this.Uid});
+  final String uid;
+
+  const ProfileScreen({super.key, required this.uid});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -29,20 +30,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // TODO: implement initState
     super.initState();
     getdata();
-    if (widget.Uid == _auth.currentUser!.uid) {
+    if (widget.uid == _auth.currentUser?.uid && mounted) {
       setState(() {
         yourse = true;
       });
     }
   }
 
-  getdata() async {
-    DocumentSnapshot snap = await _firebaseFirestore
-        .collection('users')
-        .doc(_auth.currentUser!.uid)
-        .get();
-    following = (snap.data()! as dynamic)['following'];
-    if (following.contains(widget.Uid)) {
+  Future<void> getdata() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return;
+
+    final snap =
+        await _firebaseFirestore.collection('users').doc(currentUser.uid).get();
+
+    if (!snap.exists || !mounted) return;
+    final data = snap.data();
+    final followingData =
+        data is Map<String, dynamic> ? data['following'] : null;
+    following = followingData is List ? followingData : <dynamic>[];
+
+    if (following.contains(widget.uid)) {
       setState(() {
         follow = true;
       });
@@ -59,31 +67,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: FutureBuilder(
-                  future: Firebase_Firestor().getUser(UID: widget.Uid),
+                child: FutureBuilder<Usermodel>(
+                  future: Firebase_Firestor().getUser(UID: widget.uid),
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
+                    final user = snapshot.data;
+                    if (user == null) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    return Head(snapshot.data!);
+                    return Head(user);
                   },
                 ),
               ),
-              StreamBuilder(
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: _firebaseFirestore
                     .collection('posts')
-                    .where('uid', isEqualTo: widget.Uid)
+                    .where('uid', isEqualTo: widget.uid)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
+                  final posts = snapshot.data;
+                  if (posts == null) {
                     return SliverToBoxAdapter(
                         child:
                             const Center(child: CircularProgressIndicator()));
                   }
-                  post_lenght = snapshot.data!.docs.length;
+                  post_lenght = posts.docs.length;
                   return SliverGrid(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final snap = snapshot.data!.docs[index];
+                      final snap = posts.docs[index];
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -220,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: GestureDetector(
                 onTap: () {
                   if (yourse == false) {
-                    Firebase_Firestor().flollow(uid: widget.Uid);
+                    Firebase_Firestor().flollow(uid: widget.uid);
                     setState(() {
                       follow = true;
                     });
@@ -255,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Firebase_Firestor().flollow(uid: widget.Uid);
+                        Firebase_Firestor().flollow(uid: widget.uid);
                         setState(() {
                           follow = false;
                         });

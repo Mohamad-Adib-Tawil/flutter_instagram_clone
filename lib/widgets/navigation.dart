@@ -91,7 +91,7 @@ class _Navigations_ScreenState extends State<Navigations_Screen> {
           AddScreen(),
           ReelScreen(),
           ProfileScreen(
-            Uid: _auth.currentUser!.uid,
+            uid: _auth.currentUser!.uid,
           ),
         ],
       ),

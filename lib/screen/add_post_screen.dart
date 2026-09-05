@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_instagram_clone/screen/addpost_text.dart';
@@ -18,15 +19,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
   File? _file;
   int currentPage = 0;
   int? lastPage;
-  @override
-  _fetchNewMedia() async {
+  Future<void> _fetchNewMedia() async {
     lastPage = currentPage;
     final PermissionState ps = await PhotoManager.requestPermissionExtend();
     if (ps.isAuth) {
-      List<AssetPathEntity> album =
+      final List<AssetPathEntity> album =
           await PhotoManager.getAssetPathList(type: RequestType.image);
-      List<AssetEntity> media =
-          await album[0].getAssetListPaged(page: currentPage, size: 60);
+      if (album.isEmpty) return;
+
+      final List<AssetEntity> media =
+          await album.first.getAssetListPaged(page: currentPage, size: 60);
 
       for (var asset in media) {
         if (asset.type == AssetType.image) {
@@ -40,28 +42,32 @@ class _AddPostScreenState extends State<AddPostScreen> {
       List<Widget> temp = [];
       for (var asset in media) {
         temp.add(
-          FutureBuilder(
+          FutureBuilder<Uint8List?>(
             future: asset.thumbnailDataWithSize(ThumbnailSize(200, 200)),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done)
+              final thumbnail = snapshot.data;
+              if (snapshot.connectionState == ConnectionState.done &&
+                  thumbnail != null) {
                 return Container(
                   child: Stack(
                     children: [
                       Positioned.fill(
                         child: Image.memory(
-                          snapshot.data!,
+                          thumbnail,
                           fit: BoxFit.cover,
                         ),
                       ),
                     ],
                   ),
                 );
+              }
 
               return Container();
             },
           ),
         );
       }
+      if (!mounted) return;
       setState(() {
         _mediaList.addAll(temp);
         currentPage++;
@@ -78,6 +84,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   int indexx = 0;
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -95,13 +102,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: GestureDetector(
                 onTap: () {
+                  final file = _file;
+                  if (file == null) return;
+
                   Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => AddPostTextScreen(_file!),
+                    builder: (context) => AddPostTextScreen(file),
                   ));
                 },
                 child: Text(
                   'Next',
-                  style: TextStyle(fontSize: 15.sp, color: Colors.blue),
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    color: _file == null ? Colors.grey : Colors.blue,
+                  ),
                 ),
               ),
             ),
@@ -116,7 +129,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 SizedBox(
                   height: 375.h,
                   child: GridView.builder(
-                    itemCount: _mediaList.isEmpty ? _mediaList.length : 1,
+                    itemCount: _mediaList.isEmpty ? 0 : 1,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 1,
@@ -124,7 +137,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       crossAxisSpacing: 1,
                     ),
                     itemBuilder: (context, index) {
-                      return _mediaList[indexx];
+                      final selectedIndex =
+                          indexx.clamp(0, _mediaList.length - 1);
+                      return _mediaList[selectedIndex];
                     },
                   ),
                 ),
@@ -156,7 +171,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       onTap: () {
                         setState(() {
                           indexx = index;
-                          _file = path[index];
+                          if (index < path.length) {
+                            _file = path[index];
+                          }
                         });
                       },
                       child: _mediaList[index],

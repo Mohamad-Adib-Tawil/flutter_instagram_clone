@@ -104,7 +104,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) =>
-                                        ProfileScreen(Uid: snap.id),
+                                        ProfileScreen(uid: snap.id),
                                   ));
                                 },
                                 child: Row(
