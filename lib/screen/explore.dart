@@ -18,6 +18,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
   final search = TextEditingController();
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   bool show = true;
+
+  @override
+  void dispose() {
+    super.dispose();
+    search.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,20 +35,32 @@ class _ExploreScreenState extends State<ExploreScreen> {
           slivers: [
             SearchBox(),
             if (show)
-              StreamBuilder<QuerySnapshot>(
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: _firebaseFirestore.collection('posts').snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const SliverToBoxAdapter(
-                      child: Center(
-                        child: CircularProgressIndicator(),
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 300.h,
+                        child: const Center(child: CircularProgressIndicator()),
                       ),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return SliverToBoxAdapter(
+                      child: _buildErrorState(snapshot.error.toString()),
+                    );
+                  }
+                  final posts = snapshot.data;
+                  if (posts == null || posts.docs.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: _buildEmptyState(),
                     );
                   }
                   return SliverGrid(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final snap = snapshot.data!.docs[index];
+                        final snap = posts.docs[index];
                         return GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(
@@ -62,7 +81,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           ),
                         );
                       },
-                      childCount: snapshot.data!.docs.length,
+                      childCount: posts.docs.length,
                     ),
                     gridDelegate: SliverQuiltedGridDelegate(
                       crossAxisCount: 3,
@@ -74,21 +93,37 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         QuiltedGridTile(1, 1),
                         QuiltedGridTile(1, 1),
                         QuiltedGridTile(1, 1),
+                        QuiltedGridTile(1, 1),
                       ],
                     ),
                   );
                 },
               ),
             if (!show)
-              StreamBuilder(
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: _firebaseFirestore
                     .collection('users')
                     .where('username', isGreaterThanOrEqualTo: search.text)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const SliverToBoxAdapter(
-                        child: Center(child: CircularProgressIndicator()));
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 200.h,
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return SliverToBoxAdapter(
+                      child: _buildErrorState(snapshot.error.toString()),
+                    );
+                  }
+                  final users = snapshot.data;
+                  if (users == null || users.docs.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: _buildSearchEmptyState(search.text),
+                    );
                   }
                   return SliverPadding(
                     padding:
@@ -96,7 +131,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final snap = snapshot.data!.docs[index];
+                          final snap = users.docs[index];
                           return Column(
                             children: [
                               SizedBox(height: 10.h),
@@ -123,13 +158,111 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             ],
                           );
                         },
-                        childCount: snapshot.data!.docs.length,
+                        childCount: users.docs.length,
                       ),
                     ),
                   );
                 },
               )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return SizedBox(
+      height: 300.h,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.explore_outlined,
+                size: 64,
+                color: Colors.grey.shade400,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No posts to explore',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Posts from people you follow will appear here',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchEmptyState(String query) {
+    return SizedBox(
+      height: 200.h,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.search_off,
+                size: 48,
+                color: Colors.grey.shade400,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'No users found for "$query"',
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Try searching with a different name',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return SizedBox(
+      height: 200.h,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text(
+                'Failed to load',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => setState(() {}),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
       ),
     );

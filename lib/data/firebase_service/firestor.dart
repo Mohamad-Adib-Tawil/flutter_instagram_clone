@@ -45,7 +45,7 @@ class Firebase_Firestor {
           snapuser['profile'],
           snapuser['username']);
     } on FirebaseException catch (e) {
-      throw exceptions(e.message.toString());
+      throw AppException(e.message.toString());
     }
   }
 

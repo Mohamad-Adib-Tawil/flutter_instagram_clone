@@ -104,7 +104,7 @@ class _SignupScreenState extends State<SignupScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            "Don you have account?  ",
+            "Don't you have an account?  ",
             style: TextStyle(
               fontSize: 14.sp,
               color: Colors.grey,
@@ -139,7 +139,7 @@ class _SignupScreenState extends State<SignupScreen> {
               bio: bio.text,
               profile: _imageFile ?? File(''),
             );
-          } on exceptions catch (e) {
+          } on AppException catch (e) {
             dialogBuilder(context, e.message);
           }
         },

@@ -21,23 +21,23 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  int post_lenght = 0;
-  bool yourse = false;
+  int postLength = 0;
+  bool isOwnProfile = false;
   List following = [];
-  bool follow = false;
+  bool isFollowing = false;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getdata();
+    _loadFollowingData();
     if (widget.uid == _auth.currentUser?.uid && mounted) {
       setState(() {
-        yourse = true;
+        isOwnProfile = true;
       });
     }
   }
 
-  Future<void> getdata() async {
+  Future<void> _loadFollowingData() async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) return;
 
@@ -52,8 +52,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (following.contains(widget.uid)) {
       setState(() {
-        follow = true;
+        isFollowing = true;
       });
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Log Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      await _auth.signOut();
+      // Navigation handled by MainPage authStateChanges stream
     }
   }
 
@@ -70,9 +96,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: FutureBuilder<Usermodel>(
                   future: Firebase_Firestor().getUser(UID: widget.uid),
                   builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return _buildErrorState(snapshot.error.toString());
+                    }
                     final user = snapshot.data;
                     if (user == null) {
-                      return const Center(child: CircularProgressIndicator());
+                      return _buildEmptyState('User not found');
                     }
                     return Head(user);
                   },
@@ -84,13 +121,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     .where('uid', isEqualTo: widget.uid)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  final posts = snapshot.data;
-                  if (posts == null) {
+                  if (snapshot.connectionState == ConnectionState.waiting &&
+                      postLength == 0) {
                     return SliverToBoxAdapter(
-                        child:
-                            const Center(child: CircularProgressIndicator()));
+                      child: const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
                   }
-                  post_lenght = posts.docs.length;
+                  if (snapshot.hasError) {
+                    return _buildErrorState(
+                      snapshot.error.toString(),
+                      isSliver: true,
+                    );
+                  }
+                  final posts = snapshot.data;
+                  if (posts == null || posts.docs.isEmpty) {
+                    return _buildEmptyState(
+                      isOwnProfile ? 'No posts yet' : 'No posts available',
+                      isSliver: true,
+                    );
+                  }
+                  postLength = posts.docs.length;
                   return SliverGrid(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final snap = posts.docs[index];
@@ -103,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           snap['postImage'],
                         ),
                       );
-                    }, childCount: post_lenght),
+                    }, childCount: postLength),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -118,6 +173,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildErrorState(String error, {bool isSliver = false}) {
+    final widget = Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            const Text(
+              'Failed to load profile',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => setState(() {}),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+    return isSliver ? SliverToBoxAdapter(child: widget) : widget;
+  }
+
+  Widget _buildEmptyState(String message, {bool isSliver = false}) {
+    final widget = Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.post_add, size: 48, color: Colors.grey.shade400),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+    return isSliver ? SliverToBoxAdapter(child: widget) : widget;
   }
 
   // ignore: non_constant_identifier_names
@@ -146,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       SizedBox(width: 35.w),
                       Text(
-                        post_lenght.toString(),
+                        postLength.toString(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16.sp,
@@ -196,7 +303,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ],
-              )
+              ),
+              if (isOwnProfile) ...[
+                const Spacer(),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_horiz),
+                  onSelected: (value) {
+                    if (value == 'logout') {
+                      _handleLogout();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'logout',
+                      child: Row(
+                        children: [
+                          Icon(Icons.logout, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Log Out', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+              ],
             ],
           ),
           Padding(
@@ -224,15 +355,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           SizedBox(height: 20.h),
           Visibility(
-            visible: !follow,
+            visible: !isFollowing,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 13.w),
               child: GestureDetector(
                 onTap: () {
-                  if (yourse == false) {
+                  if (!isOwnProfile) {
                     Firebase_Firestor().flollow(uid: widget.uid);
                     setState(() {
-                      follow = true;
+                      isFollowing = true;
                     });
                   }
                 },
@@ -241,14 +372,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 30.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: yourse ? Colors.white : Colors.blue,
+                    color: isOwnProfile ? Colors.white : Colors.blue,
                     borderRadius: BorderRadius.circular(5.r),
                     border: Border.all(
-                        color: yourse ? Colors.grey.shade400 : Colors.blue),
+                        color:
+                            isOwnProfile ? Colors.grey.shade400 : Colors.blue),
                   ),
-                  child: yourse
-                      ? Text('Edit Your Profile')
-                      : Text(
+                  child: isOwnProfile
+                      ? const Text('Edit Your Profile')
+                      : const Text(
                           'Follow',
                           style: TextStyle(color: Colors.white),
                         ),
@@ -257,7 +389,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Visibility(
-            visible: follow,
+            visible: isFollowing && !isOwnProfile,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 13.w),
               child: Row(
@@ -267,7 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: () {
                         Firebase_Firestor().flollow(uid: widget.uid);
                         setState(() {
-                          follow = false;
+                          isFollowing = false;
                         });
                       },
                       child: Container(
@@ -279,7 +411,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             borderRadius: BorderRadius.circular(5.r),
                             border: Border.all(color: Colors.grey.shade200),
                           ),
-                          child: Text('Unfollow')),
+                          child: const Text('Unfollow')),
                     ),
                   ),
                   SizedBox(width: 8.w),
@@ -293,7 +425,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(5.r),
                         border: Border.all(color: Colors.grey.shade200),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Message',
                         style: TextStyle(color: Colors.black),
                       ),

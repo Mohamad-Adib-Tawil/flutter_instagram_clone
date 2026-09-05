@@ -12,8 +12,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,29 +39,124 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         backgroundColor: const Color(0xffFAFAFA),
       ),
-      body: CustomScrollView(
-        slivers: [
-          StreamBuilder(
-            stream: _firebaseFirestore
-                .collection('posts')
-                .orderBy('time', descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (!snapshot.hasData) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    return PostWidget(snapshot.data!.docs[index].data());
-                  },
-                  childCount:
-                      snapshot.data == null ? 0 : snapshot.data!.docs.length,
-                ),
-              );
-            },
-          )
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Trigger refresh by rebuilding
+          setState(() {});
+        },
+        child: CustomScrollView(
+          slivers: [
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: _firebaseFirestore
+                  .collection('posts')
+                  .orderBy('time', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 300.h,
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return SliverToBoxAdapter(
+                    child: _buildErrorState(snapshot.error.toString()),
+                  );
+                }
+                final posts = snapshot.data;
+                if (posts == null || posts.docs.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: _buildEmptyState(),
+                  );
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return PostWidget(posts.docs[index].data());
+                    },
+                    childCount: posts.docs.length,
+                  ),
+                );
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return SizedBox(
+      height: 300.h,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.post_add,
+                size: 64,
+                color: Colors.grey.shade400,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No posts yet',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Follow people to see their posts here',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Navigate to explore/search tab
+                  // This would need a callback to parent navigation
+                },
+                icon: const Icon(Icons.search),
+                label: const Text('Discover People'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return SizedBox(
+      height: 300.h,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text(
+                'Failed to load posts',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => setState(() {}),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

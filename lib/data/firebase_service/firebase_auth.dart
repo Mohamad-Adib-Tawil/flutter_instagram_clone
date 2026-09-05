@@ -16,7 +16,7 @@ class Authentication {
       await _auth.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
     } on FirebaseException catch (e) {
-      throw exceptions(e.message.toString());
+      throw AppException(e.message.toString());
     }
   }
 
@@ -60,13 +60,13 @@ class Authentication {
                 : URL,
           );
         } else {
-          throw exceptions('password and confirm password should be same');
+          throw AppException('password and confirm password should be same');
         }
       } else {
-        throw exceptions('enter all the fields');
+        throw AppException('enter all the fields');
       }
     } on FirebaseException catch (e) {
-      throw exceptions(e.message.toString());
+      throw AppException(e.message.toString());
     }
   }
 }
