@@ -1,17 +1,80 @@
-# instagram_new
+# Instagram Clone
 
-A new Flutter project.
+تطبيق تواصل اجتماعي مبني باستخدام Flutter، مستوحى من تجربة Instagram، ويهدف إلى توفير أساس عملي قابل للتطوير لبناء تطبيق اجتماعي متكامل.
 
-## Getting Started
+## نبذة عن المشروع
 
-This project is a starting point for a Flutter application.
+يحتوي التطبيق على واجهات وتجارب أساسية لتطبيقات التواصل الاجتماعي، مع استخدام Firebase لإدارة الحسابات والبيانات والملفات. تم تجهيز المشروع ليكون نقطة بداية مناسبة لإضافة مزايا جديدة وتحسين تجربة المستخدم مستقبلًا.
 
-A few resources to get you started if this is your first Flutter project:
+## المزايا الحالية
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- إنشاء حساب وتسجيل الدخول باستخدام Firebase Authentication.
+- عرض المنشورات في الصفحة الرئيسية.
+- إنشاء المنشورات وإضافة النصوص والصور.
+- إنشاء وعرض مقاطع Reels.
+- الإعجاب بالمنشورات ومقاطع Reels.
+- إضافة التعليقات وعرضها.
+- متابعة المستخدمين وإلغاء متابعتهم.
+- عرض الملفات الشخصية وعدد المتابعين والمتابَعين.
+- استكشاف المستخدمين والمحتوى.
+- رفع الصور ومقاطع الفيديو باستخدام Firebase Storage.
+- تخزين البيانات ومزامنتها باستخدام Cloud Firestore.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## التقنيات المستخدمة
+
+- Flutter و Dart
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Storage
+- Firebase Core
+- Image Picker
+- Photo Manager
+- Video Player
+
+## متطلبات التشغيل
+
+- Flutter SDK بإصدار يدعم Dart 3.1 أو أحدث.
+- Android Studio أو Xcode حسب المنصة المستهدفة.
+- مشروع Firebase مهيأ لتطبيق Android و iOS.
+
+## التشغيل محليًا
+
+```bash
+git clone https://github.com/Mohamad-Adib-Tawil/flutter_instagram_clone.git
+cd flutter_instagram_clone
+flutter pub get
+flutter run
+```
+
+## إعداد Firebase
+
+أنشئ مشروع Firebase خاصًا بك، وأضف تطبيقي Android و iOS، ثم حدّث ملفات الإعداد وفعّل Authentication و Cloud Firestore و Storage. طبّق قواعد أمان مناسبة قبل استخدام التطبيق في الإنتاج.
+
+## هيكل المشروع
+
+```text
+lib/
+├── auth/                 # شاشات المصادقة والتنقل الرئيسي
+├── data/                 # الخدمات والنماذج والتعامل مع Firebase
+├── screen/               # شاشات التطبيق
+├── util/                 # الأدوات والمكونات المساعدة
+└── main.dart             # نقطة تشغيل التطبيق
+```
+
+## خارطة التطوير
+
+- تحسين إدارة الحالة وفصل منطق الأعمال عن الواجهات.
+- إضافة الإشعارات والرسائل الخاصة.
+- تحسين البحث والأداء وتجربة الاستخدام.
+- إضافة اختبارات unit و widget و integration.
+- تجهيز التطبيق للنشر على Android و iOS.
+
+## المساهمة
+
+الاقتراحات والتحسينات مرحب بها. يرجى فتح Issue لاقتراح ميزة أو الإبلاغ عن مشكلة، أو إنشاء Pull Request للتغييرات البرمجية.
+
+## الترخيص
+
+هذا التطبيق مخصص للتعلم والتدريب فقط، وليس منتجًا تجاريًا. تم تعلم وتطوير أجزاء المشروع من خلال الاستفادة من الشروحات والدروس التقنية المنشورة على YouTube.
+
+كل الشكر للمبرمج **alireza4585** على شروحاته الجميلة والمفيدة.
