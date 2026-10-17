@@ -1441,7 +1441,7 @@ Legacy inventory (Flutter code from the old app) and when it dies:
 ### Phase 0 — Safety & setup
 Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/warnings from legacy code allowed). From P0-T07 on: 0 issues.
 
-#### [ ] P0-T01 — Snapshot current state on a new branch
+#### [x] P0-T01 — Snapshot current state on a new branch
 - **Read**: none. **Files**: none (git only) + this plan.
 - **Steps**:
   1. `cd "$ROOT" && git status --short` (expect many M/D/?? entries — that is the uncommitted work to preserve).
@@ -1452,7 +1452,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: `git log --oneline -1`.
 - **Commit**: as in step 4 (the plan file tick goes in the next commit together with P0-T02).
 
-#### [ ] P0-T02 — Extend .gitignore
+#### [x] P0-T02 — Extend .gitignore
 - **Read**: `.gitignore`. **Files**: M `.gitignore`.
 - **Steps**: append exactly:
   ```
@@ -2861,6 +2861,8 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 
 | date | task id | status | notes |
 |------|---------|--------|-------|
+| 2026-10-17 | P0-T01 | done | Snapshot committed on branch halalgram/v1 |
+| 2026-10-17 | P0-T02 | done | Ignore env, keystores, and supabase temp |
 
 ---
 

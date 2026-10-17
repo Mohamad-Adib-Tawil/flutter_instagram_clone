@@ -46,3 +46,14 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Halalgram
+env/*.json
+!env/example.json
+!env/ci.json
+coverage/
+android/key.properties
+*.jks
+*.keystore
+supabase/.temp/
+supabase/.branches/
