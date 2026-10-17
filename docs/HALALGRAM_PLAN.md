@@ -1471,7 +1471,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: commands in Accept.
 - **Commit**: `chore(repo): P0-T02 ignore env, keystores, supabase temp`
 
-#### [ ] P0-T03 — Create AI rule files
+#### [x] P0-T03 — Create AI rule files
 - **Read**: §9 of this plan. **Files**: C `.cursor/rules/halalgram-core.mdc`, C `.cursor/rules/halalgram-features.mdc`, C `.cursor/rules/halalgram-migrations.mdc`, C `AGENTS.md`.
 - **Steps**: write each file with the exact contents from §9.1–§9.4.
 - **Accept**: 4 files exist; `wc -l .cursor/rules/halalgram-core.mdc` < 60.
@@ -2863,6 +2863,7 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 |------|---------|--------|-------|
 | 2026-10-17 | P0-T01 | done | Snapshot committed on branch halalgram/v1 |
 | 2026-10-17 | P0-T02 | done | Ignore env, keystores, and supabase temp |
+| 2026-10-17 | P0-T03 | done | Added three Cursor rules and AGENTS.md |
 
 ---
 

@@ -1,0 +1,40 @@
+---
+description: Halalgram core executor rules (always on)
+alwaysApply: true
+---
+
+# Halalgram — core rules
+
+Source of truth: `docs/HALALGRAM_PLAN.md`. Contract = §1. Tasks = §7.
+
+## Workflow
+- Do exactly ONE task ID at a time, in §7 order. Read only the files it lists.
+- Create/modify/delete only the files listed in the task.
+- After the task: run VERIFY-STD (§1.3); tick the task `[x]`; add a §10 row; commit with the task's exact message.
+- STOP and report (task ID, blocker, exact error) when: a command fails twice, an API differs from the plan, a spec is ambiguous, a file/package is not listed, or an OWNER-ACTION is reached.
+
+## Commands
+- Always `fvm flutter ...` / `fvm dart ...`. Never plain `flutter` / `dart`.
+- Run with `--dart-define-from-file=env/dev.json`.
+- Never `supabase db reset`. `supabase db push` only in the task that creates the migration.
+
+## Hard bans
+- No new/removed/upgraded packages outside §5.
+- No `service_role` key, DB password, or secrets in code, logs, or commits. Never commit or print `env/dev.json`, `env/prod.json`, or `android/key.properties`. `env/example.json` and `env/ci.json` are the only env files that may be committed.
+- Never edit migrations 001–003 or any already-pushed migration.
+- No hardcoded user-visible strings: use `LocaleKeys.x.tr()` and add keys to BOTH `ar.json` and `en.json`.
+- No hardcoded colors/sizes/spacing/durations: use tokens in `lib/core/theme/` (§4). Only `Colors.transparent` is allowed.
+- No `left/right` layout: use `EdgeInsetsDirectional`, `AlignmentDirectional`, `PositionedDirectional`.
+- No `print` / `debugPrint`: use `loggerProvider`.
+- No Instagram logo, wordmark, gradients, or icon assets. No music features.
+- No unrelated refactors, renames, or reformatting.
+
+## Architecture (details §3)
+- Feature-first Clean Architecture: `lib/features/<f>/{domain,data,presentation,di}`.
+- `domain/` is pure Dart (no Flutter, no Supabase).
+- `presentation/` never imports `data/`; it uses providers from `di/`.
+- `package:supabase_flutter` only in `bootstrap.dart`, `core/network`, `core/di`, `features/*/data`, `features/*/di`.
+- Riverpod generator (`@riverpod`), freezed, fpdart `FutureEither`, go_router. Copy §3.4 templates exactly.
+
+## Reporting
+- Final report ≤10 lines: task ID, files changed, verify results, commit hash.

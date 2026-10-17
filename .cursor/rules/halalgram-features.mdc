@@ -1,0 +1,19 @@
+---
+description: Layer rules for Halalgram feature code
+globs: lib/features/**
+alwaysApply: false
+---
+
+# Feature layer rules (plan §3.2–§3.4)
+
+- `domain/entities`: freezed classes, no JSON, no Flutter imports.
+- `domain/repositories`: abstract interface classes returning `FutureEither<T>` or `Stream<T>`.
+- `domain/usecases`: one public `call` method; validation returns `Left(ValidationFailure(...))`.
+- `data/models`: freezed + json_serializable (`field_rename: snake` via build.yaml); `toEntity(...)` maps to domain.
+- `data/datasources`: only place that talks to Supabase; throws; never returns Either.
+- `data/repositories`: wraps datasource calls with `guard(...)` (T3) → `FutureEither`.
+- `di/<f>_providers.dart`: keepAlive providers for datasource, repository, and each use case (`<useCaseCamel>Provider`).
+- `presentation/providers`: `@riverpod` notifiers; read use cases from `di/`; never import `data/`.
+- `presentation/screens|widgets`: tokens from `lib/core/theme`, strings from `LocaleKeys`, directional layout only.
+- Paginated lists use `cursorPagingController` (T6) + `PagingListener`; images use `AppNetworkImage` only.
+- Cross-feature imports allowed only for another feature's `domain/` entities and `di/` providers.

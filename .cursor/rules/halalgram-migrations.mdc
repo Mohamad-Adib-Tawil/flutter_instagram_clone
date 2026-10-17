@@ -1,0 +1,17 @@
+---
+description: Rules for Supabase SQL migrations
+globs: supabase/migrations/**
+alwaysApply: false
+---
+
+# Migration rules (plan §6)
+
+- Never edit 001–003 or any migration already shown as remote in `supabase migration list`.
+- File names are fixed by §6.7. Create only the file named in the current task.
+- Follow §6.0 conventions exactly: header comment, uuid PKs `DEFAULT gen_random_uuid()`, `TIMESTAMPTZ NOT NULL DEFAULT now()`, FKs `ON DELETE CASCADE`, indexes as listed in §6.1.
+- Every new table: `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;` plus the exact policies from §6.2 (`TO authenticated`, `(select auth.uid())`).
+- Functions: `SET search_path = public`; `SECURITY DEFINER` only where §6.4 says, and then check `auth.uid()` inside.
+- After each function: `REVOKE ALL ... FROM PUBLIC, anon; GRANT EXECUTE ... TO authenticated;`.
+- Never use `gen_random_bytes`; use `substr(md5(random()::text), 1, 6)`.
+- Push with `supabase db push`, then confirm with `supabase migration list`. Never `supabase db reset`.
+- Never put secrets, emails, or real user data in SQL files.
