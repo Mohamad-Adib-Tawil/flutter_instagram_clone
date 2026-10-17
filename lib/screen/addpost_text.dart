@@ -1,8 +1,10 @@
+// lib/screen/addpost_text.dart
+// Post creation screen using Supabase
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/storage.dart';
+import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AddPostTextScreen extends StatefulWidget {
@@ -31,15 +33,13 @@ class _AddPostTextScreenState extends State<AddPostTextScreen> {
     });
 
     try {
-      String postUrl =
-          await StorageMethod().uploadImageToStorage('post', widget.file);
-      await Firebase_Firestor().CreatePost(
-        postImage: postUrl,
+      await SupabasePostsService.instance.createPost(
+        imageFile: widget.file,
         caption: caption.text,
         location: location.text,
       );
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (e) {
       if (mounted) {

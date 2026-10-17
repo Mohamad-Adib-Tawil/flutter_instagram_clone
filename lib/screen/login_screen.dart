@@ -1,8 +1,10 @@
+// lib/screen/login_screen.dart
+// Login screen using Supabase Auth
+
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firebase_auth.dart';
+import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
 import 'package:flutter_instagram_clone/util/dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback show;
@@ -141,11 +143,22 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await Authentication().Login(email: emailText, password: passwordText);
-      // Success - auth state will handle navigation via MainPage
-    } on Exception catch (e) {
-      if (mounted) {
-        _showError(_getUserFriendlyError(e));
+      final result = await AuthService.instance.signIn(
+        email: emailText,
+        password: passwordText,
+      );
+
+      if (result.success) {
+        if (result.emailConfirmationRequired) {
+          if (mounted) {
+            _showError('Please verify your email address before signing in.');
+          }
+        }
+        // Success - auth state will handle navigation via MainPage
+      } else {
+        if (mounted) {
+          _showError(result.errorMessage ?? 'Login failed. Please try again.');
+        }
       }
     } finally {
       if (mounted) {
@@ -158,30 +171,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isValidEmail(String email) {
     return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
-  }
-
-  String _getUserFriendlyError(Exception e) {
-    final message = e.toString();
-    if (message.contains('user-not-found') ||
-        message.contains('wrong-password') ||
-        message.contains('invalid-credential') ||
-        message.contains('invalid-login-credentials')) {
-      return 'Invalid email or password. Please try again.';
-    }
-    if (message.contains('user-disabled')) {
-      return 'This account has been disabled. Please contact support.';
-    }
-    if (message.contains('too-many-requests')) {
-      return 'Too many login attempts. Please try again later.';
-    }
-    if (message.contains('network-request-failed') ||
-        message.contains('network error')) {
-      return 'Network error. Please check your connection and try again.';
-    }
-    if (message.contains('invalid-email')) {
-      return 'Invalid email format. Please check your email.';
-    }
-    return 'Login failed. Please try again.';
   }
 
   void _showError(String message) {
@@ -256,15 +245,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _sendPasswordResetEmail(String email) async {
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      final result = await AuthService.instance.resetPassword(email);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password reset link sent to $email')),
-        );
+        if (result.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Password reset link sent to $email')),
+          );
+        } else {
+          _showError(result.errorMessage ?? 'Failed to send reset email.');
+        }
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (mounted) {
-        _showError('Failed to send reset email: ${_getUserFriendlyError(e)}');
+        _showError('Failed to send reset email. Please try again.');
       }
     }
   }

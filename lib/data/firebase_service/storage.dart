@@ -1,17 +1,24 @@
+// lib/data/firebase_service/storage.dart
+// Firebase Storage upload using Supabase Auth for user identity
+
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 
 class StorageMethod {
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  var uid = Uuid().v4();
+  final _uuid = const Uuid();
 
   Future<String> uploadImageToStorage(String name, File file) async {
-    Reference ref =
-        _storage.ref().child(name).child(_auth.currentUser!.uid).child(uid);
+    final userId = AuthService.instance.currentUserId;
+    if (userId == null) {
+      throw Exception('No authenticated user');
+    }
+
+    final uid = _uuid.v4();
+    Reference ref = _storage.ref().child(name).child(userId).child(uid);
 
     UploadTask uploadTask = ref.putFile(file);
     TaskSnapshot snapshot = await uploadTask;

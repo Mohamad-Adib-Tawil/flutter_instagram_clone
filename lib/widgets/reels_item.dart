@@ -1,5 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// lib/widgets/reels_item.dart
+// Reels widget using Supabase Auth for current user identity
+
 import 'package:flutter/material.dart';
+import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
 import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
 import 'package:flutter_instagram_clone/util/image_cached.dart';
 import 'package:flutter_instagram_clone/widgets/comment.dart';
@@ -20,26 +23,26 @@ class _ReelsItemState extends State<ReelsItem> {
   bool play = true;
   bool isAnimating = false;
   String user = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    user = _auth.currentUser!.uid;
+    user = AuthService.instance.currentUserId ?? '';
     // ignore: deprecated_member_use
     controller = VideoPlayerController.network(widget.snapshot['reelsvideo'])
       ..initialize().then((value) {
-        setState(() {
-          controller.setLooping(true);
-          controller.setVolume(1);
-          controller.play();
-        });
+        if (mounted) {
+          setState(() {
+            controller.setLooping(true);
+            controller.setVolume(1);
+            controller.play();
+          });
+        }
       });
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     controller.dispose();
   }
@@ -51,14 +54,16 @@ class _ReelsItemState extends State<ReelsItem> {
       children: [
         GestureDetector(
           onDoubleTap: () {
-            Firebase_Firestor().like(
-                like: widget.snapshot['like'],
-                type: 'reels',
-                uid: user,
-                postId: widget.snapshot['postId']);
-            setState(() {
-              isAnimating = true;
-            });
+            if (user.isNotEmpty) {
+              Firebase_Firestor().like(
+                  like: widget.snapshot['like'],
+                  type: 'reels',
+                  uid: user,
+                  postId: widget.snapshot['postId']);
+              setState(() {
+                isAnimating = true;
+              });
+            }
           },
           onTap: () {
             setState(() {
@@ -117,11 +122,13 @@ class _ReelsItemState extends State<ReelsItem> {
               LikeAnimation(
                 child: IconButton(
                   onPressed: () {
-                    Firebase_Firestor().like(
-                        like: widget.snapshot['like'],
-                        type: 'reels',
-                        uid: user,
-                        postId: widget.snapshot['postId']);
+                    if (user.isNotEmpty) {
+                      Firebase_Firestor().like(
+                          like: widget.snapshot['like'],
+                          type: 'reels',
+                          uid: user,
+                          postId: widget.snapshot['postId']);
+                    }
                   },
                   icon: Icon(
                     widget.snapshot['like'].contains(user)

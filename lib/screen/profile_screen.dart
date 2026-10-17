@@ -1,9 +1,14 @@
+// lib/screen/profile_screen.dart
+// Profile screen - profile data from Supabase, posts from Supabase, follows from Firebase (transitional)
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
 import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
-import 'package:flutter_instagram_clone/data/model/usermodel.dart';
+import 'package:flutter_instagram_clone/data/model/post.dart';
+import 'package:flutter_instagram_clone/data/model/user_profile.dart';
+import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
+import 'package:flutter_instagram_clone/data/supabase_service/supabase_profile.dart';
 import 'package:flutter_instagram_clone/screen/post_screen.dart';
 import 'package:flutter_instagram_clone/util/image_cached.dart';
 import 'package:flutter_instagram_clone/widgets/post_widget.dart';
@@ -20,29 +25,45 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  int postLength = 0;
   bool isOwnProfile = false;
   List following = [];
   bool isFollowing = false;
+
+  // Posts state
+  final _posts = <Post>[];
+  PostCursor? _nextCursor;
+  bool _isLoadingPosts = false;
+  bool _hasMorePosts = true;
+  bool _hasPostsError = false;
+  String? _postsErrorMessage;
+  final _postsScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _loadFollowingData();
-    if (widget.uid == _auth.currentUser?.uid && mounted) {
+    final currentUserId = AuthService.instance.currentUserId;
+    if (widget.uid == currentUserId && mounted) {
       setState(() {
         isOwnProfile = true;
       });
     }
+    _postsScrollController.addListener(_onPostsScroll);
+    _loadUserPosts();
+  }
+
+  @override
+  void dispose() {
+    _postsScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadFollowingData() async {
-    final currentUser = _auth.currentUser;
-    if (currentUser == null) return;
+    final currentUserId = AuthService.instance.currentUserId;
+    if (currentUserId == null) return;
 
     final snap =
-        await _firebaseFirestore.collection('users').doc(currentUser.uid).get();
+        await _firebaseFirestore.collection('users').doc(currentUserId).get();
 
     if (!snap.exists || !mounted) return;
     final data = snap.data();
@@ -54,6 +75,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         isFollowing = true;
       });
+    }
+  }
+
+  Future<void> _loadUserPosts() async {
+    if (_isLoadingPosts) return;
+    setState(() {
+      _isLoadingPosts = true;
+    });
+
+    try {
+      final page = await SupabasePostsService.instance.getUserPosts(
+        userId: widget.uid,
+      );
+      if (mounted) {
+        setState(() {
+          _posts.clear();
+          _posts.addAll(page.posts);
+          _nextCursor = page.nextCursor;
+          _hasMorePosts = page.hasMore;
+          _isLoadingPosts = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingPosts = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadMorePosts() async {
+    if (_isLoadingPosts || !_hasMorePosts || _nextCursor == null) return;
+
+    setState(() {
+      _isLoadingPosts = true;
+    });
+
+    try {
+      final page = await SupabasePostsService.instance.getUserPosts(
+        userId: widget.uid,
+        cursor: _nextCursor,
+      );
+      if (mounted) {
+        setState(() {
+          _posts.addAll(page.posts);
+          _nextCursor = page.nextCursor;
+          _hasMorePosts = page.hasMore;
+          _isLoadingPosts = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingPosts = false;
+        });
+      }
+    }
+  }
+
+  void _onPostsScroll() {
+    if (_postsScrollController.position.pixels >=
+        _postsScrollController.position.maxScrollExtent - 200) {
+      _loadMorePosts();
     }
   }
 
@@ -78,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (confirm == true && mounted) {
-      await _auth.signOut();
+      await AuthService.instance.signOut();
       // Navigation handled by MainPage authStateChanges stream
     }
   }
@@ -91,10 +176,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.grey.shade100,
         body: SafeArea(
           child: CustomScrollView(
+            controller: _postsScrollController,
             slivers: [
               SliverToBoxAdapter(
-                child: FutureBuilder<Usermodel>(
-                  future: Firebase_Firestor().getUser(UID: widget.uid),
+                child: FutureBuilder<UserProfile?>(
+                  future:
+                      SupabaseProfileService.instance.getProfile(widget.uid),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -115,63 +202,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
               ),
-              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: _firebaseFirestore
-                    .collection('posts')
-                    .where('uid', isEqualTo: widget.uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting &&
-                      postLength == 0) {
-                    return SliverToBoxAdapter(
-                      child: const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return _buildErrorState(
-                      snapshot.error.toString(),
-                      isSliver: true,
-                    );
-                  }
-                  final posts = snapshot.data;
-                  if (posts == null || posts.docs.isEmpty) {
-                    return _buildEmptyState(
-                      isOwnProfile ? 'No posts yet' : 'No posts available',
-                      isSliver: true,
-                    );
-                  }
-                  postLength = posts.docs.length;
-                  return SliverGrid(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final snap = posts.docs[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => PostScreen(snap.data())));
-                        },
-                        child: CachedImage(
-                          snap['postImage'],
-                        ),
-                      );
-                    }, childCount: postLength),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                    ),
-                  );
-                },
+              _isLoadingPosts && _posts.isEmpty
+                  ? _buildPostsLoading()
+                  : _posts.isEmpty
+                      ? _buildEmptyPosts()
+                      : _buildPostsGrid(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostsLoading() {
+    return SliverToBoxAdapter(
+      child: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyPosts() {
+    return SliverToBoxAdapter(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.post_add, size: 48, color: Colors.grey.shade400),
+              const SizedBox(height: 16),
+              Text(
+                isOwnProfile ? 'No posts yet' : 'No posts available',
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPostsGrid() {
+    return SliverGrid(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == _posts.length) {
+          return _isLoadingPosts && _hasMorePosts
+              ? _buildLoadMoreIndicator()
+              : const SizedBox.shrink();
+        }
+        final post = _posts[index];
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => PostScreen(post)));
+          },
+          child: CachedImage(
+            SupabasePostsService.instance.getPostImageUrl(post.imagePath),
+          ),
+        );
+      },
+          childCount:
+              _posts.length + (_isLoadingPosts && _hasMorePosts ? 1 : 0)),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return Padding(
+      padding: EdgeInsets.all(16.h),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -228,7 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // ignore: non_constant_identifier_names
-  Widget Head(Usermodel user) {
+  Widget Head(UserProfile user) {
     return Container(
       color: Colors.white,
       child: Column(
@@ -242,7 +350,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: SizedBox(
                     width: 80.w,
                     height: 80.h,
-                    child: CachedImage(user.profile),
+                    child: CachedImage(
+                      user.avatarPath != null
+                          ? SupabaseProfileService.instance
+                              .getAvatarPublicUrl(user.avatarPath!)
+                          : null,
+                    ),
                   ),
                 ),
               ),
@@ -253,27 +366,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       SizedBox(width: 35.w),
                       Text(
-                        postLength.toString(),
+                        _posts.length.toString(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16.sp,
                         ),
                       ),
                       SizedBox(width: 53.w),
-                      Text(
-                        user.followers.length.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
-                        ),
+                      // Follower/following counts from Firebase (transitional)
+                      // Will be migrated in Phase G
+                      FutureBuilder<int>(
+                        future: _getFollowerCount(),
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data?.toString() ?? '0',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                            ),
+                          );
+                        },
                       ),
                       SizedBox(width: 70.w),
-                      Text(
-                        user.following.length.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
-                        ),
+                      FutureBuilder<int>(
+                        future: _getFollowingCount(),
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data?.toString() ?? '0',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -456,5 +581,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  Future<int> _getFollowerCount() async {
+    try {
+      final snap =
+          await _firebaseFirestore.collection('users').doc(widget.uid).get();
+      final data = snap.data();
+      final followers = data?['followers'];
+      return followers is List ? followers.length : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<int> _getFollowingCount() async {
+    try {
+      final snap =
+          await _firebaseFirestore.collection('users').doc(widget.uid).get();
+      final data = snap.data();
+      final following = data?['following'];
+      return following is List ? following.length : 0;
+    } catch (_) {
+      return 0;
+    }
   }
 }

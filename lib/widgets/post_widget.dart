@@ -1,32 +1,37 @@
+// lib/widgets/post_widget.dart
+// Post widget using Supabase Post model and Supabase Auth
+
 import 'package:date_format/date_format.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
+import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
+import 'package:flutter_instagram_clone/core/database/supabase_client.dart';
+import 'package:flutter_instagram_clone/data/model/post.dart';
+import 'package:flutter_instagram_clone/data/supabase_service/supabase_profile.dart';
+import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
 import 'package:flutter_instagram_clone/util/image_cached.dart';
 import 'package:flutter_instagram_clone/widgets/comment.dart';
 import 'package:flutter_instagram_clone/widgets/like_animation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PostWidget extends StatefulWidget {
-  final snapshot;
-  PostWidget(this.snapshot, {super.key});
+  final Post post;
+  const PostWidget(this.post, {super.key});
 
   @override
   State<PostWidget> createState() => _PostWidgetState();
 }
 
 class _PostWidgetState extends State<PostWidget> {
-  @override
   bool isAnimating = false;
   String user = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    user = _auth.currentUser!.uid;
+    user = AuthService.instance.currentUserId ?? '';
   }
 
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -40,15 +45,20 @@ class _PostWidgetState extends State<PostWidget> {
                 child: SizedBox(
                   width: 35.w,
                   height: 35.h,
-                  child: CachedImage(widget.snapshot['profileImage']),
+                  child: CachedImage(
+                    widget.post.author.avatarPath != null
+                        ? SupabaseDatabase.avatarsStorage
+                            .getPublicUrl(widget.post.author.avatarPath!)
+                        : null,
+                  ),
                 ),
               ),
               title: Text(
-                widget.snapshot['username'],
+                widget.post.author.username,
                 style: TextStyle(fontSize: 13.sp),
               ),
               subtitle: Text(
-                widget.snapshot['location'],
+                widget.post.location,
                 style: TextStyle(fontSize: 11.sp),
               ),
               trailing: const Icon(Icons.more_horiz),
@@ -57,14 +67,13 @@ class _PostWidgetState extends State<PostWidget> {
         ),
         GestureDetector(
           onDoubleTap: () {
-            Firebase_Firestor().like(
-                like: widget.snapshot['like'],
-                type: 'posts',
-                uid: user,
-                postId: widget.snapshot['postId']);
-            setState(() {
-              isAnimating = true;
-            });
+            if (user.isNotEmpty) {
+              // TODO: Phase F - implement Supabase likes
+              // Firebase_Firestor().like(...)
+              setState(() {
+                isAnimating = true;
+              });
+            }
           },
           child: Stack(
             alignment: Alignment.center,
@@ -73,7 +82,8 @@ class _PostWidgetState extends State<PostWidget> {
                 width: 375.w,
                 height: 375.h,
                 child: CachedImage(
-                  widget.snapshot['postImage'],
+                  SupabaseDatabase.postImagesStorage
+                      .getPublicUrl(widget.post.imagePath),
                 ),
               ),
               AnimatedOpacity(
@@ -111,23 +121,17 @@ class _PostWidgetState extends State<PostWidget> {
                   LikeAnimation(
                     child: IconButton(
                       onPressed: () {
-                        Firebase_Firestor().like(
-                            like: widget.snapshot['like'],
-                            type: 'posts',
-                            uid: user,
-                            postId: widget.snapshot['postId']);
+                        if (user.isNotEmpty) {
+                          // TODO: Phase F - implement Supabase likes
+                        }
                       },
                       icon: Icon(
-                        widget.snapshot['like'].contains(user)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: widget.snapshot['like'].contains(user)
-                            ? Colors.red
-                            : Colors.black,
+                        Icons.favorite_border,
+                        color: Colors.black,
                         size: 24.w,
                       ),
                     ),
-                    isAnimating: widget.snapshot['like'].contains(user),
+                    isAnimating: false,
                   ),
                   SizedBox(width: 17.w),
                   GestureDetector(
@@ -145,8 +149,7 @@ class _PostWidgetState extends State<PostWidget> {
                               initialChildSize: 0.6,
                               minChildSize: 0.2,
                               builder: (context, scrollController) {
-                                return Comment(
-                                    'posts', widget.snapshot['postId']);
+                                return Comment('posts', widget.post.id);
                               },
                             ),
                           );
@@ -180,7 +183,8 @@ class _PostWidgetState extends State<PostWidget> {
                   bottom: 8.h,
                 ),
                 child: Text(
-                  widget.snapshot['like'].length.toString(),
+                  // TODO: Phase F - implement likes count from Supabase
+                  '0',
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w500,
@@ -193,9 +197,9 @@ class _PostWidgetState extends State<PostWidget> {
                   children: [
                     Expanded(
                       child: Text(
-                        widget.snapshot['username'] +
+                        widget.post.author.username +
                             ' :  ' +
-                            widget.snapshot['caption'],
+                            widget.post.caption,
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w500,
@@ -208,8 +212,7 @@ class _PostWidgetState extends State<PostWidget> {
               Padding(
                 padding: EdgeInsets.only(left: 15.w, top: 20.h, bottom: 8.h),
                 child: Text(
-                  formatDate(widget.snapshot['time'].toDate(),
-                      [yyyy, '-', mm, '-', dd]),
+                  formatDate(widget.post.createdAt, [yyyy, '-', mm, '-', dd]),
                   style: TextStyle(fontSize: 11.sp, color: Colors.grey),
                 ),
               ),

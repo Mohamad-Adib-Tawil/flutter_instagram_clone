@@ -1,3 +1,9 @@
+// lib/data/firebase_service/firebase_auth.dart
+// DEPRECATED: This file is retained for reference only.
+// Authentication has been migrated to Supabase Auth via lib/core/auth/auth_service.dart
+// This file is no longer imported or used anywhere in the application.
+// It can be safely deleted after verification.
+
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,8 +12,11 @@ import 'package:flutter_instagram_clone/data/firebase_service/storage.dart';
 
 import 'package:flutter_instagram_clone/util/exeption.dart';
 
+@Deprecated('Use AuthService from lib/core/auth/auth_service.dart instead')
 class Authentication {
   FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @Deprecated('Use AuthService.instance.signIn()')
   Future<void> Login({
     required String email,
     required String password,
@@ -20,6 +29,7 @@ class Authentication {
     }
   }
 
+  @Deprecated('Use AuthService.instance.signUp() + SupabaseProfileService')
   Future<void> Signup({
     required String email,
     required String password,

@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+// lib/widgets/navigation.dart
+// Bottom navigation using Supabase Auth for current user
+
 import 'package:flutter/material.dart';
+import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
 import 'package:flutter_instagram_clone/screen/add_screen.dart';
 import 'package:flutter_instagram_clone/screen/explor_screen.dart';
 import 'package:flutter_instagram_clone/screen/explore.dart';
@@ -20,33 +22,33 @@ int _currentIndex = 0;
 
 class _Navigations_ScreenState extends State<Navigations_Screen> {
   late PageController pageController;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     pageController = PageController();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     pageController.dispose();
   }
 
-  onPageChanged(int page) {
+  void onPageChanged(int page) {
     setState(() {
       _currentIndex = page;
     });
   }
 
-  navigationTapped(int page) {
+  void navigationTapped(int page) {
     pageController.jumpToPage(page);
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = AuthService.instance.currentUserId;
+
     return Scaffold(
       bottomNavigationBar: Container(
         child: BottomNavigationBar(
@@ -91,7 +93,7 @@ class _Navigations_ScreenState extends State<Navigations_Screen> {
           AddScreen(),
           ReelScreen(),
           ProfileScreen(
-            uid: _auth.currentUser!.uid,
+            uid: currentUserId ?? '',
           ),
         ],
       ),
