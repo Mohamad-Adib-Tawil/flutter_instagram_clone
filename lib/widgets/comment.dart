@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
-import 'package:flutter_instagram_clone/util/image_cached.dart';
+import 'package:halalgram/data/firebase_service/firestor.dart';
+import 'package:halalgram/util/image_cached.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Comment extends StatefulWidget {

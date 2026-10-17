@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/screen/add_post_screen.dart';
-import 'package:flutter_instagram_clone/screen/add_reels_screen.dart';
+import 'package:halalgram/screen/add_post_screen.dart';
+import 'package:halalgram/screen/add_reels_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AddScreen extends StatefulWidget {

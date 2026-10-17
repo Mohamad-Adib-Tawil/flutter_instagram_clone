@@ -1,7 +1,7 @@
 // lib/data/model/user_profile.dart
 // Application-level user profile model (backend-neutral)
 
-import 'package:flutter_instagram_clone/core/config/supabase_config.dart';
+import 'package:halalgram/core/config/supabase_config.dart';
 
 class UserProfile {
   const UserProfile({

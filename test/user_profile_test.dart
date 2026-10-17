@@ -1,7 +1,7 @@
 // lib/test/user_profile_test.dart
 // Unit tests for UserProfile model and validation
 
-import 'package:flutter_instagram_clone/data/model/user_profile.dart';
+import 'package:halalgram/data/model/user_profile.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -3,15 +3,15 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
-import 'package:flutter_instagram_clone/data/model/post.dart';
-import 'package:flutter_instagram_clone/data/model/user_profile.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_profile.dart';
-import 'package:flutter_instagram_clone/screen/post_screen.dart';
-import 'package:flutter_instagram_clone/util/image_cached.dart';
-import 'package:flutter_instagram_clone/widgets/post_widget.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/data/firebase_service/firestor.dart';
+import 'package:halalgram/data/model/post.dart';
+import 'package:halalgram/data/model/user_profile.dart';
+import 'package:halalgram/data/supabase_service/supabase_posts.dart';
+import 'package:halalgram/data/supabase_service/supabase_profile.dart';
+import 'package:halalgram/screen/post_screen.dart';
+import 'package:halalgram/util/image_cached.dart';
+import 'package:halalgram/widgets/post_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileScreen extends StatefulWidget {

@@ -2,8 +2,8 @@
 // Single post view using Supabase Post model
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/model/post.dart';
-import 'package:flutter_instagram_clone/widgets/post_widget.dart';
+import 'package:halalgram/data/model/post.dart';
+import 'package:halalgram/widgets/post_widget.dart';
 
 class PostScreen extends StatelessWidget {
   final Post post;

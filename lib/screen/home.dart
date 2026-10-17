@@ -2,9 +2,9 @@
 // Home screen (feed) - Supabase with keyset pagination
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/model/post.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
-import 'package:flutter_instagram_clone/widgets/post_widget.dart';
+import 'package:halalgram/data/model/post.dart';
+import 'package:halalgram/data/supabase_service/supabase_posts.dart';
+import 'package:halalgram/widgets/post_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeScreen extends StatefulWidget {

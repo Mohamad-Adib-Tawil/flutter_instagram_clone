@@ -3,9 +3,9 @@
 // Remaining: reels, comments, likes, follows
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/data/model/usermodel.dart';
-import 'package:flutter_instagram_clone/util/exeption.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/data/model/usermodel.dart';
+import 'package:halalgram/util/exeption.dart';
 import 'package:uuid/uuid.dart';
 
 class Firebase_Firestor {

@@ -7,10 +7,10 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/storage.dart';
+import 'package:halalgram/data/firebase_service/firestor.dart';
+import 'package:halalgram/data/firebase_service/storage.dart';
 
-import 'package:flutter_instagram_clone/util/exeption.dart';
+import 'package:halalgram/util/exeption.dart';
 
 @Deprecated('Use AuthService from lib/core/auth/auth_service.dart instead')
 class Authentication {

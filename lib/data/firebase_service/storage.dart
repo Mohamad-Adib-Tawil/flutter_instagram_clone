@@ -3,7 +3,7 @@
 
 import 'dart:io';
 
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 

@@ -1,7 +1,7 @@
 // lib/data/model/post.dart
 // Backend-neutral post model
 
-import 'package:flutter_instagram_clone/data/model/user_profile.dart';
+import 'package:halalgram/data/model/user_profile.dart';
 
 class Post {
   const Post({

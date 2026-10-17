@@ -3,9 +3,9 @@
 
 import 'dart:io';
 
-import 'package:flutter_instagram_clone/core/config/supabase_config.dart';
-import 'package:flutter_instagram_clone/core/database/supabase_client.dart';
-import 'package:flutter_instagram_clone/data/model/user_profile.dart';
+import 'package:halalgram/core/config/supabase_config.dart';
+import 'package:halalgram/core/database/supabase_client.dart';
+import 'package:halalgram/data/model/user_profile.dart';
 import 'package:path/path.dart' as p;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';

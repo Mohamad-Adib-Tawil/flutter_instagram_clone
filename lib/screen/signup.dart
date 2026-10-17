@@ -4,12 +4,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/core/config/supabase_config.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_profile.dart';
-import 'package:flutter_instagram_clone/util/dialog.dart';
-import 'package:flutter_instagram_clone/util/exeption.dart';
-import 'package:flutter_instagram_clone/util/imagepicker.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/core/config/supabase_config.dart';
+import 'package:halalgram/data/supabase_service/supabase_profile.dart';
+import 'package:halalgram/util/dialog.dart';
+import 'package:halalgram/util/exeption.dart';
+import 'package:halalgram/util/imagepicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignupScreen extends StatefulWidget {

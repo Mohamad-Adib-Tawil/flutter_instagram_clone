@@ -1478,7 +1478,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: `ls .cursor/rules AGENTS.md`.
 - **Commit**: `docs(agents): P0-T03 add Halalgram agent rules`
 
-#### [ ] P0-T04 — Rename Dart package to `halalgram`
+#### [x] P0-T04 — Rename Dart package to `halalgram`
 - **Read**: `pubspec.yaml` (first 25 lines). **Files**: M `pubspec.yaml`, M every `lib/**.dart` and `test/**.dart` containing `package:flutter_instagram_clone/`.
 - **Steps**:
   1. In `pubspec.yaml` set `name: halalgram` and `description: "Halalgram — a modest social app."`.
@@ -2864,6 +2864,7 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 | 2026-10-17 | P0-T01 | done | Snapshot committed on branch halalgram/v1 |
 | 2026-10-17 | P0-T02 | done | Ignore env, keystores, and supabase temp |
 | 2026-10-17 | P0-T03 | done | Added three Cursor rules and AGENTS.md |
+| 2026-10-17 | P0-T04 | done | Renamed Dart package to halalgram; 0 errors |
 
 ---
 

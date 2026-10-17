@@ -2,13 +2,13 @@
 // Bottom navigation using Supabase Auth for current user
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/screen/add_screen.dart';
-import 'package:flutter_instagram_clone/screen/explor_screen.dart';
-import 'package:flutter_instagram_clone/screen/explore.dart';
-import 'package:flutter_instagram_clone/screen/home.dart';
-import 'package:flutter_instagram_clone/screen/profile_screen.dart';
-import 'package:flutter_instagram_clone/screen/reelsScreen.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/screen/add_screen.dart';
+import 'package:halalgram/screen/explor_screen.dart';
+import 'package:halalgram/screen/explore.dart';
+import 'package:halalgram/screen/home.dart';
+import 'package:halalgram/screen/profile_screen.dart';
+import 'package:halalgram/screen/reelsScreen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Navigations_Screen extends StatefulWidget {

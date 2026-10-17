@@ -3,14 +3,14 @@
 
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/core/database/supabase_client.dart';
-import 'package:flutter_instagram_clone/data/model/post.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_profile.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
-import 'package:flutter_instagram_clone/util/image_cached.dart';
-import 'package:flutter_instagram_clone/widgets/comment.dart';
-import 'package:flutter_instagram_clone/widgets/like_animation.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/core/database/supabase_client.dart';
+import 'package:halalgram/data/model/post.dart';
+import 'package:halalgram/data/supabase_service/supabase_profile.dart';
+import 'package:halalgram/data/supabase_service/supabase_posts.dart';
+import 'package:halalgram/util/image_cached.dart';
+import 'package:halalgram/widgets/comment.dart';
+import 'package:halalgram/widgets/like_animation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PostWidget extends StatefulWidget {

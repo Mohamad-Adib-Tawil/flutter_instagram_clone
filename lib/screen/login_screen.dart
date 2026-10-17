@@ -2,8 +2,8 @@
 // Login screen using Supabase Auth
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/util/dialog.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/util/dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {

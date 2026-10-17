@@ -2,9 +2,9 @@
 // Root authentication gate using Supabase Auth
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/auth/auth_screen.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/widgets/navigation.dart';
+import 'package:halalgram/auth/auth_screen.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/widgets/navigation.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});

@@ -2,11 +2,11 @@
 // Reels widget using Supabase Auth for current user identity
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/core/auth/auth_service.dart';
-import 'package:flutter_instagram_clone/data/firebase_service/firestor.dart';
-import 'package:flutter_instagram_clone/util/image_cached.dart';
-import 'package:flutter_instagram_clone/widgets/comment.dart';
-import 'package:flutter_instagram_clone/widgets/like_animation.dart';
+import 'package:halalgram/core/auth/auth_service.dart';
+import 'package:halalgram/data/firebase_service/firestor.dart';
+import 'package:halalgram/util/image_cached.dart';
+import 'package:halalgram/widgets/comment.dart';
+import 'package:halalgram/widgets/like_animation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_player/video_player.dart';
 

@@ -4,7 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_instagram_clone/data/supabase_service/supabase_posts.dart';
+import 'package:halalgram/data/supabase_service/supabase_posts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AddPostTextScreen extends StatefulWidget {
