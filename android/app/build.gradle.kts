@@ -3,7 +3,6 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
 }
 
 val keystoreProperties = Properties().apply {
@@ -14,7 +13,7 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.instagram"
+    namespace = "com.halalgram.app"
     compileSdk = 36
     ndkVersion = "29.0.14206865"
 
@@ -24,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.instagram"
+        applicationId = "com.halalgram.app"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode

@@ -1,4 +1,4 @@
-package com.example.instagram_new
+package com.halalgram.app
 
 import io.flutter.embedding.android.FlutterActivity
 

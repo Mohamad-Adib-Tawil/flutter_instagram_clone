@@ -1488,7 +1488,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: `fvm flutter analyze | grep -c " error "` → `0`.
 - **Commit**: `chore(repo): P0-T04 rename dart package to halalgram`
 
-#### [ ] P0-T05 — Rename Android app to com.halalgram.app
+#### [x] P0-T05 — Rename Android app to com.halalgram.app
 - **Read**: `android/app/build.gradle.kts`, `android/settings.gradle.kts`, `android/app/src/main/AndroidManifest.xml`. **Files**: M those 3; C `android/app/src/main/kotlin/com/halalgram/app/MainActivity.kt`; C `android/app/src/main/res/values/strings.xml`; C `android/app/src/main/res/values-ar/strings.xml`; D `android/app/src/main/kotlin/com/example/` (whole folder).
 - **Steps**:
   1. `build.gradle.kts`: `namespace = "com.halalgram.app"`, `applicationId = "com.halalgram.app"`; delete the line `id("com.google.gms.google-services")` (needed: the google-services plugin fails for the new id; Firebase Dart code keeps using explicit `firebase_options.dart` until P9).
@@ -2865,6 +2865,9 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 | 2026-10-17 | P0-T02 | done | Ignore env, keystores, and supabase temp |
 | 2026-10-17 | P0-T03 | done | Added three Cursor rules and AGENTS.md |
 | 2026-10-17 | P0-T04 | done | Renamed Dart package to halalgram; 0 errors |
+| 2026-10-17 | P0-T05 | blocked | Build failed twice; owner must reinstall NDK 28.2.13676358 through Android Studio SDK Manager |
+
+| 2026-10-28 | P0-T05 | done | Identity checks passed; NDK installed automatically; debug APK built successfully |
 
 ---
 
