@@ -2871,6 +2871,8 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 
 | 2026-10-28 | P0-T06 | done | iOS identity and permissions verified; unsigned device build passed |
 
+| 2026-10-28 | P0-T06 | approved | Owner approved generated CocoaPods workspace reference and Podfile.lock |
+
 ---
 
 ## 11. Known risks & decisions
