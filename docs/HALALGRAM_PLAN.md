@@ -1523,7 +1523,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: `fvm flutter build ios --debug --no-codesign` (no Xcode → OWNER-ACTION). If CocoaPods reports a higher minimum iOS version, set exactly that version in the Podfile and log it.
 - **Commit**: `chore(ios): P0-T06 rename bundle id and add usage descriptions`
 
-#### [ ] P0-T07 — Lints: very_good_analysis + riverpod_lint, legacy excluded
+#### [x] P0-T07 — Lints: very_good_analysis + riverpod_lint, legacy excluded
 - **Read**: `analysis_options.yaml`, `pubspec.yaml` (environment + dev_dependencies). **Files**: M `pubspec.yaml`, M `analysis_options.yaml` (full replace).
 - **Steps**:
   1. pubspec `environment:` → `sdk: ^3.13.0` and `flutter: ">=3.47.0"`. dev_dependencies: remove `flutter_lints`, add `very_good_analysis: ^11.0.0`.
@@ -2873,6 +2873,11 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 
 | 2026-10-28 | P0-T06 | approved | Owner approved generated CocoaPods workspace reference and Podfile.lock |
 
+| 2026-10-28 | P0-T07 | blocked | Analyzer and 15 tests pass; formatter rejects legacy comment.dart:122 final parameter |
+| 2026-10-28 | ENV-01 | Android verified; iOS blocked | Lockfile, analyzer, 15 tests, APK passed; iOS simulator exhausted disk; invalid parameter modifier fixed |
+
+| 2026-10-28 | P0-T07 | done | Lockfile resolution, format parsing, analyzer and all 15 tests passed |
+
 ---
 
 ## 11. Known risks & decisions
@@ -2903,3 +2908,41 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 - Riverpod examples: https://github.com/rrousselGit/riverpod/tree/master/examples
 - Starter architecture (Riverpod + go_router): https://github.com/bizz84/starter_architecture_flutter_firebase
 - Clean architecture TDD reference: https://github.com/ResoCoder/flutter-tdd-clean-architecture-course
+
+## 12. Shared toolchain baseline — ENV-01 (2026-10-28)
+
+Owner-requested maintenance scope: `android/build.gradle.kts`,
+`android/app/build.gradle.kts`, `android/gradle.properties`,
+`lib/widgets/comment.dart` (remove invalid parameter modifier blocking the build), and this plan.
+This task is independent of the feature-migration sequence in section 7.
+
+- Flutter 3.47.2 via `.fvmrc`; Dart 3.13.2; use `fvm flutter` / `fvm dart`.
+- Java/JVM 17; Gradle 9.3.1-bin; AGP 9.1.0; Kotlin 2.4.0.
+- Flutter plugin loader 1.0.0; preserve the current Flutter compatibility DSL flags.
+- Android compileSdk/targetSdk 36; minSdk 24.
+- NDK 29.0.14206865 for the application and Android library plugins. Use
+  `LibraryAndroidComponentsExtension.finalizeDsl`; do not rely on reflection
+  that swallows configuration errors or modify downloaded plugin sources.
+- iOS deployment target 15.0 (already configured in Podfile and Xcode).
+- Gradle heap 4G active; 8G commented, for verified heap exhaustion with spare RAM.
+
+The application's feature-first/Riverpod migration remains governed by section 7.
+This baseline does not mark unimplemented architecture or backend tasks complete.
+Preserve signing, application identities, existing dependency constraints and lockfile.
+
+Verification: enforce the existing lockfile, analyze, run existing tests, build an
+Android debug APK and an unsigned iOS simulator app when disk space permits.
+Build success is separate from launching the application or verifying login/backend flows.
+
+Results: `pub get --enforce-lockfile` passed without dependency upgrades;
+`flutter analyze` reported no issues under existing legacy exclusions; 15 existing
+tests passed; Android debug APK built. Removing the invalid `final` modifier from
+`comment_item` resolved a legacy compiler error hidden by those analyzer exclusions.
+Some existing plugins still emit Flutter's future built-in Kotlin migration warning.
+The iOS simulator build failed with Xcode `database or disk is full` / `No space left
+on device`; iOS compatibility and runtime flows are not verified by this attempt.
+Moved only this attempt's partial `build/ios/Debug-iphonesimulator` output
+(approximately 206 MB) to `~/.Trash/Halalgram-iOS-partial-2026-10-28-ENV01`;
+it remains recoverable and occupies disk space until Trash is emptied.
+Preserved device builds and shared Xcode DerivedData. Retry iOS after making more
+disk space available.
