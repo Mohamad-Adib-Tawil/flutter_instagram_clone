@@ -1508,7 +1508,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: `fvm flutter build apk --debug` succeeds (legacy app; no dart-defines needed). JDK missing → OWNER-ACTION per §1.3.
 - **Commit**: `chore(android): P0-T05 rename app id to com.halalgram.app`
 
-#### [ ] P0-T06 — Rename iOS app and add permissions
+#### [x] P0-T06 — Rename iOS app and add permissions
 - **Read**: `ios/Runner/Info.plist`, `ios/Podfile` (first 3 lines). **Files**: M `ios/Runner.xcodeproj/project.pbxproj`, M `ios/Runner/Info.plist`, M `ios/Podfile`.
 - **Steps**:
   1. `sed -i '' 's/com\.example\.instagramNew\.RunnerTests/com.halalgram.app.RunnerTests/g; s/com\.example\.instagramNew/com.halalgram.app/g' ios/Runner.xcodeproj/project.pbxproj`
@@ -2868,6 +2868,8 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 | 2026-10-17 | P0-T05 | blocked | Build failed twice; owner must reinstall NDK 28.2.13676358 through Android Studio SDK Manager |
 
 | 2026-10-28 | P0-T05 | done | Identity checks passed; NDK installed automatically; debug APK built successfully |
+
+| 2026-10-28 | P0-T06 | done | iOS identity and permissions verified; unsigned device build passed |
 
 ---
 
