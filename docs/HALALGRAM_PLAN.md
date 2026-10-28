@@ -1571,7 +1571,7 @@ Note: until P0-T07 is done, `fvm flutter analyze` must show 0 **errors** (infos/
 - **Verify**: VERIFY-STD (skip l10n/build_runner/check_rules lines).
 - **Commit**: `chore(lint): P0-T07 very_good_analysis and riverpod_lint`
 
-#### [ ] P0-T08 — Folder skeleton, rule-check script, env template, launch config
+#### [x] P0-T08 — Folder skeleton, rule-check script, env template, launch config
 - **Read**: none. **Files**: C `.gitkeep` files (below), C `tool/check_rules.sh`, C `env/example.json`, C `.vscode/launch.json`.
 - **Steps**:
   1. Run:
@@ -2877,6 +2877,9 @@ Flutter 3.47.2 (fvm), Riverpod 3 + generator, go_router, freezed, fpdart, easy_l
 | 2026-10-28 | ENV-01 | Android verified; iOS blocked | Lockfile, analyzer, 15 tests, APK passed; iOS simulator exhausted disk; invalid parameter modifier fixed |
 
 | 2026-10-28 | P0-T07 | done | Lockfile resolution, format parsing, analyzer and all 15 tests passed |
+
+| 2026-10-28 | P0-T08 | done | Skeleton created; rule checks OK; analyzer and 15 tests passed |
+| 2026-10-28 | P0-T09 | OWNER-ACTION | No Halalgram cloud project or dev config; only unrelated Mawada project accessible |
 
 ---
 
