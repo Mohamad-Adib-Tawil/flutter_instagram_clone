@@ -119,7 +119,7 @@ class _CommentState extends State<Comment> {
     );
   }
 
-  Widget comment_item(final snapshot) {
+  Widget comment_item(snapshot) {
     return ListTile(
       leading: ClipOval(
         child: SizedBox(

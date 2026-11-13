@@ -1,3 +1,5 @@
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+
 allprojects {
     repositories {
         google()
@@ -14,16 +16,11 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
-    // Force NDK version for all subprojects (transitive plugins)
-    afterEvaluate {
-        val androidExt = project.extensions.findByName("android")
-        if (androidExt != null) {
-            try {
-                val ndkVersionProp = androidExt.javaClass.getDeclaredField("ndkVersion")
-                ndkVersionProp.isAccessible = true
-                ndkVersionProp.set(androidExt, "29.0.14206865")
-            } catch (e: Exception) {
-                // Ignore if property doesn't exist
+    // Apply after each plugin has configured its Android DSL.
+    plugins.withId("com.android.library") {
+        extensions.configure<LibraryAndroidComponentsExtension> {
+            finalizeDsl { android ->
+                android.ndkVersion = "29.0.14206865"
             }
         }
     }

@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId = "com.halalgram.app"
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
